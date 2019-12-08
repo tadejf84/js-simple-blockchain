@@ -9,8 +9,7 @@ const SHA256 = require('crypto-js/sha256');
 */
 class Block {
 
-    constructor(index,  data, prevHash) {
-        this.index = index;
+    constructor(data, prevHash) {
         this.timestamp = Date.now();
         this.data = data;
         this.prevHash = prevHash;
@@ -37,7 +36,7 @@ class Blockchain {
     // the first block in the chain is called "genesis block"
     // has to be created manually
     createGenesisBlock() {
-        return new Block(0, "Genesis block", "null");
+        return new Block("Genesis block", "null");
     }
 
     getLastBlockInChain() {
@@ -45,9 +44,8 @@ class Blockchain {
     }
 
     addNewBlock(newBlockData) {
-        const   newBlockIndex = (this.getLastBlockInChain().index) + 1, 
-                newBlockPrevHash = this.getLastBlockInChain().hash, // link to previously created block
-                newBlock = new Block(newBlockIndex, newBlockData, newBlockPrevHash); // instantiate new block
+        const   newBlockPrevHash = this.getLastBlockInChain().hash, // link to previously created block
+                newBlock = new Block(newBlockData, newBlockPrevHash); // instantiate new block
         this.chain.push(newBlock); // push the block in the chain        
     }
 
