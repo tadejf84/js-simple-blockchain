@@ -9,16 +9,27 @@ const SHA256 = require('crypto-js/sha256');
 */
 class Block {
 
-    constructor(data, prevHash) {
-        this.timestamp = Date.now();
+    constructor(timestamp, data, hash, prevHash) {
+        this.timestamp = timestamp;
         this.data = data;
         this.prevHash = prevHash;
         this.hash = this.generateHash();
+        this.nonce = 0; // neccesary to change the content of the block to generate a new hash
     }
 
     // generate a hash for the block
     generateHash() {
-        return SHA256(this.index + this.timestamp + this.prevHash + JSON.stringify(this.data)).toString();
+        return SHA256(this.index + this.timestamp + this.prevHash + JSON.stringify(this.data) + this.nonce).toString();
+    }
+
+    // adding calculation difficulty - mining
+    mineBlock(difficulty) {
+        const zeroArr = Array(difficulty).fill("0").join("");
+        while(this.hash.substring(0, difficulty) !== zeroArr) {
+            this.nonce++;
+            this.hash = this.generateHash();
+        }
+        console.log(`Block mined: ${this.hash}` );
     }
 }
 
@@ -31,21 +42,23 @@ class Blockchain {
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
+        this.difficulty = 4;
     }
 
     // the first block in the chain is called "genesis block"
     // has to be created manually
     createGenesisBlock() {
-        return new Block("Genesis block", "null");
+        return new Block(1575829001450,"Genesis block", "null");
     }
 
     getLastBlockInChain() {
         return this.chain[this.chain.length - 1];
     }
 
-    addNewBlock(newBlockData) {
-        const   newBlockPrevHash = this.getLastBlockInChain().hash, // link to previously created block
-                newBlock = new Block(newBlockData, newBlockPrevHash); // instantiate new block
+    addNewBlock(newBlock) {
+        newBlock.prevHash = this.getLastBlockInChain().hash;
+        newBlock.timestamp = Date.now();
+        newBlock.mineBlock(this.difficulty);
         this.chain.push(newBlock); // push the block in the chain        
     }
 
@@ -64,8 +77,7 @@ class Blockchain {
 
 
 let blockchain = new Blockchain();
-blockchain.addNewBlock({ "amount": 4, "currency": "USD" });
-blockchain.addNewBlock({ "amount": 15, "currency": "EUR" });
-
+blockchain.addNewBlock( new Block({ "amount": 4, "currency": "USD" }) );
 console.log(blockchain);
-console.log( "is chain valid: " + blockchain.isChainValid());
+blockchain.addNewBlock( new Block({ "amount": 15, "currency": "EUR" }) );
+console.log(blockchain);
