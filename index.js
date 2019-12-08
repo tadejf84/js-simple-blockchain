@@ -2,9 +2,9 @@ const SHA256 = require('crypto-js/sha256');
 
 /*
 * create a single block in the blockchain
-* @param index - position of the block in the chain (in the array)
 * @param timestamp - time of block creation 
 * @param data - data that the block holds
+* @param prevHash - hash of the current block
 * @param prevHash - hash of the previous block, link to the previous block in the chain
 */
 class Block {
