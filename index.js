@@ -50,10 +50,24 @@ class Blockchain {
                 newBlock = new Block(newBlockIndex, newBlockData, newBlockPrevHash); // instantiate new block
         this.chain.push(newBlock); // push the block in the chain        
     }
+
+    // check the integrity of the blockchain
+    isChainValid() {
+        for(let i = 1; i < this.chain.length; i++) {
+            const   curBlock = this.chain[i],
+                    prevBlock = this.chain[i - 1];
+
+            if(curBlock.hash !== curBlock.generateHash()) return false;
+            if(curBlock.prevHash !== prevBlock.hash) return false; 
+        }
+        return true;
+    }
 }
 
 
 let blockchain = new Blockchain();
 blockchain.addNewBlock({ "amount": 4, "currency": "USD" });
 blockchain.addNewBlock({ "amount": 15, "currency": "EUR" });
+
 console.log(blockchain);
+console.log( "is chain valid: " + blockchain.isChainValid());
