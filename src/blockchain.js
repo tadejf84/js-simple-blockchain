@@ -2,6 +2,7 @@ const SHA256 = require('crypto-js/sha256');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+
 /**
  * Class Transaction
  * 
@@ -16,9 +17,9 @@ class Transaction {
      * @param {number} amount 
      */
     constructor(fromAddress, toAddress, amount) {
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
-        this.amount = amount;
+        this.fromAddress = fromAddress;             // Payer's wallet address - public key
+        this.toAddress = toAddress;                 // Payee's wallet address - public key
+        this.amount = amount;                       // Transaction amount        
     }
 
     /**
@@ -63,6 +64,7 @@ class Transaction {
     }
 }
 
+
 /**
  * Class Block
  * Create a single block in the blockchain
@@ -77,10 +79,10 @@ class Block {
      * @param {string} prevHash 
      */
     constructor(transactions, prevHash = null) {
-        this.timestamp = Date.now();
-        this.transactions = transactions;
-        this.prevHash = prevHash;
-        this.hash = this.calculateHash();
+        this.timestamp = Date.now();                // Block timestamp
+        this.transactions = transactions;           // All transactions in a block
+        this.prevHash = prevHash;                   // Previous block hash
+        this.hash = this.calculateHash();           // Current block hash
         this.nonce = 0;
     }
 
@@ -101,19 +103,22 @@ class Block {
      */
     mineBlock(difficulty) {
         const zeroString = Array(difficulty).fill("0").join("");
+
         while(this.hash.substring(0, difficulty) !== zeroString) {
             this.nonce++;
             this.hash = this.calculateHash();
         }
-        console.log(`Block mined: ${this.hash}` );
+
+        console.log(`Block mined: ${this.hash}`);
     }
 
     /**
-     * Check that all transactions are valid
+     * Check if all transactions are valid
      * 
      * @returns {boolean}
      */
     hasValidTransactions() {
+
         for (const tx of this.transactions) {
             if(!tx.isValid()) {
                 return false;
@@ -137,10 +142,10 @@ class Blockchain {
      * 
      */
     constructor() {
-        this.chain = [this.createGenesisBlock()];
-        this.difficulty = 4;
-        this.pendingTransactions = [];
-        this.miningReward = 100;
+        this.chain = [this.createGenesisBlock()];   // Blockchain array
+        this.difficulty = 4;                        // Difficulty setting for mining
+        this.pendingTransactions = [];              // Pending transactions
+        this.miningReward = 100;                    // Reward for mining a single block
     }
 
     /**
@@ -179,9 +184,7 @@ class Blockchain {
     /**
      * Create new transaction
      * 
-     * @param {string} fromAddress 
-     * @param {string} toAddress 
-     * @param {number} amount 
+     * @param {object} transaction 
      */
     addTransaction(transaction) {
         
@@ -246,6 +249,7 @@ class Blockchain {
         return true;
     }
 }
+
 
 // Export Blockchain class
 module.exports.Blockchain = Blockchain;
