@@ -36,12 +36,9 @@ class Transaction {
      * @param {object} keys
      */
     signTransaction(signingKey) {
-        if(signingKey.getPublic('hex') !== this.fromAddress) {
-            throw new Error('You cannot sign transactions from other wallets!');
-        }
-
-        const hashTransaction = this.calculateHash();
-        const signature = signingKey.sign(hashTransaction, 'base64');
+        if(signingKey.getPublic('hex') !== this.fromAddress) throw new Error('You cannot sign transactions from other wallets!');
+        const hashTx = this.calculateHash();
+        const signature = signingKey.sign(hashTx, 'base64');
         this.signature = signature.toDER('hex');
     }
 
@@ -51,6 +48,7 @@ class Transaction {
      * @returns {boolean}
      */
     isValid() {
+
         // All miner rewards transactions are valid
         if(this.fromAddress === null) return true;
 
